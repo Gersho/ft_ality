@@ -1,0 +1,5 @@
+# dune init proj ft_ality
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Workspace root: /nfs/homes/kzennoun/code/ft_ality
+# Auto-detected concurrency: 4
