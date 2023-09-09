@@ -1,5 +1,134 @@
-# dune init proj ft_ality
+# dune exec ft_ality
 # OCAMLPARAM: unset
 # Shared cache: disabled
 # Workspace root: /nfs/homes/kzennoun/code/ft_ality
 # Auto-detected concurrency: 4
+$ /sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlc.opt -config > /tmp/dune_94b256_output
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Dev
+#  ; merlin = true
+#  ; for_host = None
+#  ; fdo_target_exe = None
+#  ; build_dir = In_build_dir "default"
+#  ; ocaml_bin = External "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin"
+#  ; ocaml =
+#      Ok External "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocaml"
+#  ; ocamlc =
+#      External "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlc.opt"
+#  ; ocamlopt =
+#      Ok
+#        External
+#          "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlopt.opt"
+#  ; ocamldep =
+#      Ok
+#        External
+#          "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamldep.opt"
+#  ; ocamlmklib =
+#      Ok
+#        External
+#          "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlmklib.opt"
+#  ; env =
+#      map
+#        { "DUNE_OCAML_HARDCODED" :
+#            "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/lib/ocaml:/sgoinfre/goinfre/Perso/kzennoun/.opam/default/lib"
+#        ; "DUNE_OCAML_STDLIB" :
+#            "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/lib/ocaml"
+#        ; "DUNE_SOURCEROOT" : "/nfs/homes/kzennoun/code/ft_ality"
+#        ; "INSIDE_DUNE" : "/nfs/homes/kzennoun/code/ft_ality/_build/default"
+#        ; "OCAMLFIND_IGNORE_DUPS_IN" :
+#            "/nfs/homes/kzennoun/code/ft_ality/_build/install/default/lib"
+#        ; "OCAMLPATH" :
+#            "/nfs/homes/kzennoun/code/ft_ality/_build/install/default/lib"
+#        ; "OCAMLTOP_INCLUDE_PATH" :
+#            "/nfs/homes/kzennoun/code/ft_ality/_build/install/default/lib/toplevel"
+#        ; "OCAML_COLOR" : "always"
+#        ; "OPAMCOLOR" : "always"
+#        }
+#  ; findlib_paths =
+#      [ External "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/lib/ocaml"
+#      ; External "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/lib"
+#      ]
+#  ; natdynlink_supported = true
+#  ; supports_shared_libraries = true
+#  ; ocaml_config =
+#      { version = "5.0.0"
+#      ; standard_library_default =
+#          "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/lib/ocaml"
+#      ; standard_library =
+#          "/sgoinfre/goinfre/Perso/kzennoun/.opam/default/lib/ocaml"
+#      ; standard_runtime = "the_standard_runtime_variable_was_deleted"
+#      ; ccomp_type = "cc"
+#      ; c_compiler = "gcc"
+#      ; ocamlc_cflags =
+#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-pthread"; "-fPIC" ]
+#      ; ocamlc_cppflags = [ "-D_FILE_OFFSET_BITS=64" ]
+#      ; ocamlopt_cflags =
+#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-pthread"; "-fPIC" ]
+#      ; ocamlopt_cppflags = [ "-D_FILE_OFFSET_BITS=64" ]
+#      ; bytecomp_c_compiler =
+#          [ "gcc"
+#          ; "-O2"
+#          ; "-fno-strict-aliasing"
+#          ; "-fwrapv"
+#          ; "-pthread"
+#          ; "-fPIC"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ]
+#      ; bytecomp_c_libraries = [ "-lm"; "-ldl"; "-lpthread" ]
+#      ; native_c_compiler =
+#          [ "gcc"
+#          ; "-O2"
+#          ; "-fno-strict-aliasing"
+#          ; "-fwrapv"
+#          ; "-pthread"
+#          ; "-fPIC"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ]
+#      ; native_c_libraries = [ "-lm"; "-ldl"; "-lpthread" ]
+#      ; native_pack_linker = [ "ld"; "-r"; "-o" ]
+#      ; cc_profile = []
+#      ; architecture = "amd64"
+#      ; model = "default"
+#      ; int_size = 63
+#      ; word_size = 64
+#      ; system = "linux"
+#      ; asm = [ "as" ]
+#      ; asm_cfi_supported = true
+#      ; with_frame_pointers = false
+#      ; ext_exe = ""
+#      ; ext_obj = ".o"
+#      ; ext_asm = ".s"
+#      ; ext_lib = ".a"
+#      ; ext_dll = ".so"
+#      ; os_type = "Unix"
+#      ; default_executable_name = "a.out"
+#      ; systhread_supported = true
+#      ; host = "x86_64-pc-linux-gnu"
+#      ; target = "x86_64-pc-linux-gnu"
+#      ; profiling = false
+#      ; flambda = false
+#      ; spacetime = false
+#      ; safe_string = true
+#      ; exec_magic_number = "Caml1999X032"
+#      ; cmi_magic_number = "Caml1999I032"
+#      ; cmo_magic_number = "Caml1999O032"
+#      ; cma_magic_number = "Caml1999A032"
+#      ; cmx_magic_number = "Caml1999Y032"
+#      ; cmxa_magic_number = "Caml1999Z032"
+#      ; ast_impl_magic_number = "Caml1999M032"
+#      ; ast_intf_magic_number = "Caml1999N032"
+#      ; cmxs_magic_number = "Caml1999D032"
+#      ; cmt_magic_number = "Caml1999T032"
+#      ; natdynlink_supported = true
+#      ; supports_shared_libraries = true
+#      ; windows_unicode = false
+#      }
+#  }
+$ (cd _build/default && /sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -49 -nopervasives -nostdlib -g -bin-annot -I lib/.ft_ality.objs/byte -no-alias-deps -opaque -o lib/.ft_ality.objs/byte/ft_ality.cmo -c -impl lib/ft_ality.ml-gen)
+$ (cd _build/default && /sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I bin/.main.eobjs/byte -I lib/.ft_ality.objs/byte -no-alias-deps -opaque -o bin/.main.eobjs/byte/dune__exe__Main.cmi -c -intf bin/main.mli)
+$ (cd _build/default && /sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -49 -nopervasives -nostdlib -g -I lib/.ft_ality.objs/byte -I lib/.ft_ality.objs/native -intf-suffix .ml-gen -no-alias-deps -opaque -o lib/.ft_ality.objs/native/ft_ality.cmx -c -impl lib/ft_ality.ml-gen)
+$ (cd _build/default && /sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I bin/.main.eobjs/byte -I bin/.main.eobjs/native -I lib/.ft_ality.objs/byte -I lib/.ft_ality.objs/native -intf-suffix .ml -no-alias-deps -opaque -o bin/.main.eobjs/native/dune__exe__Main.cmx -c -impl bin/main.ml)
+$ (cd _build/default && /sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -a -o lib/ft_ality.cmxa lib/.ft_ality.objs/native/ft_ality.cmx)
+$ (cd _build/default && /sgoinfre/goinfre/Perso/kzennoun/.opam/default/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o bin/main.exe lib/ft_ality.cmxa bin/.main.eobjs/native/dune__exe__Main.cmx)
