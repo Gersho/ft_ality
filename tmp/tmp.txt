@@ -1,1 +1,15 @@
 https://dune.readthedocs.io/en/stable/quick-start.html
+
+open forbidden
+-> include
+-> #require
+-> #use
+
+You are allowed to use the following modules:
+◦ Pervasives
+◦ List
+◦ String
+◦ Sys
+◦ Sdl
+◦ Sdlevent
+◦ Sdlkey
