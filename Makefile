@@ -1,8 +1,22 @@
+up:
+	docker run -d --name ft_ality ft_ality_image
+
 build:
-	dune build
+	docker build -t ft_ality_image .
 
-test:
-	dune test
+exec:
+	docker exec -it ft_ality bash
 
-run:
-	dune exec ft_ality
+down: 
+	docker stop ft_ality || true
+
+rm:
+	docker rm ft_ality || true
+
+fclean: down
+	docker system prune -af
+
+re: down rm build up exec
+
+exec_test:
+	docker exec ft_ality bash -c "echo a ; echo b ; echo c; exit;"
