@@ -1,15 +1,64 @@
 https://dune.readthedocs.io/en/stable/quick-start.html
 
+from subject
+
 open forbidden
 -> include
 -> #require
 -> #use
 
+We will be using ocaml 4.14.1
+
+opam switch create 4.14.1
+some stuff might be marked deprecated in preparation to OCAML5
+-> need to watch out for compilation warnings
+
 You are allowed to use the following modules:
 ◦ Pervasives
+    The initially opened module.
+
+    This module provides the basic operations over the built-in types
+    (numbers, booleans, byte sequences, strings, exceptions, references,
+    lists, arrays, input-output channels, ...).
+
+    This module is automatically opened at the beginning of each compilation.
+    All components of this module can therefore be referred by their short name,
+    without prefixing them by Pervasives.
+
 ◦ List
+    Some functions are flagged as not tail-recursive. 
+    The above considerations can usually be ignored
+    if your lists are not longer than about 10000 elements.
+
 ◦ String
+    strings are always immutable
+
+     OCaml strings used to be modifiable in place,
+     for instance via the String.set and String.blit functions described below.
+     This usage is deprecated and only possible when the compiler
+     is put in "unsafe-string" mode by giving the -unsafe-string command-line option
+     (which is currently the default for reasons of backward compatibility).
+     This is done by making the types string and bytes (see module Bytes) interchangeable
+     so that functions expecting byte sequences can also accept strings as arguments and modify them.
+
+!!! All new code should avoid this feature and be compiled with the -safe-string command-line option
+    to enforce the separation between the types string and bytes.
+
 ◦ Sys
+    Every function in this module raises Sys_error
+    with an informative message when the underlying system call signal an error.
+
+
+https://ocamlsdl.sourceforge.net/doc/html/index.html 
 ◦ Sdl
+    This module contains functions for initializing/quitting the library 
 ◦ Sdlevent
 ◦ Sdlkey
+
+ocamlsdl has system dep libsdl1.2-dev
+
+https://stackoverflow.com/questions/60938177/linking-to-a-library-in-a-non-standard-path-when-installing-an-opam-package
+
+test opam source ocamlsdl     
+Successfully extracted to /nfs/homes/kzennoun/test/ocamlsdl.0.9.1
+-> /nfs/homes/kzennoun/local/opam/ocamlsdl.0.9.1
