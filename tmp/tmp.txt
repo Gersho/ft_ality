@@ -51,7 +51,12 @@ You are allowed to use the following modules:
 
 https://ocamlsdl.sourceforge.net/doc/html/index.html 
 ◦ Sdl
-    This module contains functions for initializing/quitting the library 
+    This module contains functions for initializing/quitting the library
+
+    val quit : unit -> unit
+    quit shuts down all SDL subsystems and frees the resources allocated to them.
+    This should always be called before you exit.
+
 ◦ Sdlevent
 ◦ Sdlkey
 
