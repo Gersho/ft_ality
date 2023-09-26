@@ -47,7 +47,7 @@ let  handle_events () =
  *)
 
 
- let sdl_init () =
+ (* let sdl_init () =
   Sdl.init [`EVERYTHING];
   Sdlevent.enable_events Sdlevent.all_events_mask
 
@@ -58,7 +58,7 @@ let rec wait_key () =
 	    | Sdlevent.KEYDOWN _ -> Format.printf "allo++\n"
       | _ -> wait_key ()
 
-let main () = sdl_init() ; wait_key()
+let main () = sdl_init() ; wait_key() *)
 
 (* let main () =
   Sdl.init [`VIDEO];
@@ -75,7 +75,7 @@ let main () = sdl_init() ; wait_key()
     (* pwet();
     Sdl.quit () *)
 
-let _ = main ()
+(* let _ = main () *)
 
 
 (* let () = print_endline "Hello, World!" *)
@@ -97,3 +97,24 @@ let _ = main ()
   | Some ( KEYDOWN { keysym = KEY_LEFT } ) -> move_x (-10.)
   | Some ( KEYDOWN { keysym = KEY_RIGHT } ) -> move_x (10.)
   | _ -> () *)
+
+
+
+  open Sdlevent
+open Sdlkey
+
+let rec wait_for_escape () =
+    match wait_event () with
+    | KEYDOWN {keysym=KEY_ESCAPE} ->
+        print_endline "You pressed escape! The fun is over now."
+    | event ->
+        print_endline (string_of_event event);
+        wait_for_escape ()
+
+let main () =
+    Sdl.init [`VIDEO];
+    at_exit Sdl.quit;
+    ignore (Sdlvideo.set_video_mode 200 200 []);
+    wait_for_escape ()
+
+let _ = main ()

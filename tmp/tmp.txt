@@ -2,6 +2,17 @@
 -> Format
 -> Array ?
 
+!!! reminder those are not allowed !!!
+Hashtbl
+Map
+Printf
+Format
+Array
+
+
+################################################################################
+################################################################################
+################################################################################
 
 https://dune.readthedocs.io/en/stable/quick-start.html
 
@@ -65,6 +76,12 @@ https://ocamlsdl.sourceforge.net/doc/html/index.html
 ◦ Sdlevent
 ◦ Sdlkey
 
+
+
+################################################################################
+################################################################################
+################################################################################
+
 ocamlsdl has system dep libsdl1.2-dev
 
 https://stackoverflow.com/questions/60938177/linking-to-a-library-in-a-non-standard-path-when-installing-an-opam-package
@@ -72,3 +89,93 @@ https://stackoverflow.com/questions/60938177/linking-to-a-library-in-a-non-stand
 test opam source ocamlsdl     
 Successfully extracted to /nfs/homes/kzennoun/test/ocamlsdl.0.9.1
 -> /nfs/homes/kzennoun/local/opam/ocamlsdl.0.9.1
+
+################################################################################
+################################################################################
+################################################################################
+
+(* allowed modules
+Pervasives Sys List String Sdl Sdlevent Sdlkey *)
+
+only list module to take care of data manipulation
+
+
+types we could use (WIP)
+problem: how to get keysym from input string ?
+
+let ality = (config, machine);
+
+let config = keyconfig list; 
+type keyconfig =
+{
+    input_string : string; <- string because it can be "space" (should we support that ?)
+    output_string : string;
+    input_keysym : Sdlkey.t; <- have to see how events work and
+                                how we get keysym/keycode info
+}
+
+(copied from turing with suggested modifications)
+type transition =
+{
+    read : char;            <- string not char as actions can be "HP" and such
+    to_state : string;      <- int not string because those will be generated and only used internally
+    write : char;           <- string, the string to print (ex: "Hadouken")
+    action : string         <- not relevant with this type of machine
+}
+
+type machine =
+{
+    name : string;          <- optional, take filename ?
+    alphabet : char list;   <- not needed, as we build the machine we know it only uses allowed strings
+    blank : char;           <- useless ? no ribbon, nothing happens when no input (blocking wait event ?)
+    states : string list;      <- not relevant with this type of machine
+    initial : string;       <- useless, should always be 0
+    finals : string list;   <- not relevant with this type of machine
+    transitions:Assoc (string , transition list);  <- int not string as they are ints now, also we need to use list module
+}
+
+so we have
+
+type transition =
+{
+    read : string
+    to_state : int;
+    write : string;
+}
+
+type machine = (int * transition list) list;
+
+(wow it sure got lighter)
+
+current state is int so we should be able to make tail recursive call like
+loop machine current_state
+current_state is int so always takes same memory and machine too
+(wouldn't work with string)
+
+parsing:
+split move by -
+for each element check if transition/state already exists and add it if not (as "i+1")
+"go" to that state for the next element
+    ex: (based on SF_Ryu)
+    parse
+    LP-MP:Light Punch into Medium Punch
+    read LP , add LP transition to state 0 creating state 1 ("move" to state 1)
+    read MP , add MP transition to state 1 creating state 2
+    then parse
+    LP-MP-6-2-3-LP:Light Punch into Medium Punch into Shoryuken (Light)
+    read LP , state 0 already has that transition in state 1 ("move" to state 1)
+    read MP , state 1 already has that transition in state 2 ("move" to state 2)
+    read 6  , add 6 transition to state 2 creating state 3 ("move" to state 3)
+    read 2  , add 2 transition to state 3 creating state 4 ("move" to state 4)
+    etc...
+
+???
+can we detect final combo like
+LP-MP-6-2-3-LP:Light Punch into Medium Punch into Shoryuken (Light)
+by checking if current state has any valid transition before waiting input ?
+or should we wait for one additional input that would "break" the combo ?
+???
+
+################################################################################
+################################################################################
+################################################################################

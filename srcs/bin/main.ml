@@ -1,3 +1,6 @@
+(* allowed modules
+Pervasives Sys List String Sdl Sdlevent Sdlkey *)
+
 
 let () = 
   (* Array forbiden module ?! *)

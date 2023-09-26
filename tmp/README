@@ -6,7 +6,7 @@
 		gmr file syntax
 ###################################
 
-trailing whitespace ignored
+trailing whitespace are ignored
 empty lines are ignored
 section names start with a @
 2 sections, @keyconfig and @movelist
