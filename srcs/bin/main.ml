@@ -1,6 +1,14 @@
 (* allowed modules
 Pervasives Sys List String Sdl Sdlevent Sdlkey *)
 
+type transition =
+{
+    read : string;
+    to_state : int;
+    write : string;
+}
+
+type states = (int * transition list) list ;
 
 let () = 
   (* Array forbiden module ?! *)
@@ -19,7 +27,8 @@ let () =
         parser (List.append accum [line]);
       end;
       | exception End_of_file -> (
-        Format.printf "finished reading\n";
+        Format.printf "finished reading the file\n";
+        close_in gmr_file;
         accum)
     in
     let result = parser [] 

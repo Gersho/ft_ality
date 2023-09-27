@@ -13,7 +13,7 @@ section names start with a @
 each section can only be present once
 each section is required
 @keyconfig is first and @movelist second
-lines before @keyconfig can be displayed but do not impact configuration
+lines before @keyconfig are ignored
 
 
 	@keyconfig:
