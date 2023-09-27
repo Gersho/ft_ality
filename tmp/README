@@ -6,14 +6,18 @@
 		gmr file syntax
 ###################################
 
-trailing whitespace are ignored
+leading/trailing whitespace are ignored
 empty lines are ignored
 section names start with a @
 2 sections, @keyconfig and @movelist
 each section can only be present once
 each section is required
+@keyconfig is first and @movelist second
+lines before @keyconfig can be displayed but do not impact configuration
+
 
 	@keyconfig:
+		symbol ":" is reserved and cannot be used as a key nor as part of an action
 		<key>:<action>
 		key and action are separated by symbol :
 
@@ -37,6 +41,7 @@ each section is required
 		<action>-<action>-<action>:<move>
 		actions are separated by -
 		actions and move are separated by :
+		- and : are reserved for action (but can be used for move name)
 
 		section must have at least 1 <action>:<move> pair
 		the same full action sequence cannot be repeated
