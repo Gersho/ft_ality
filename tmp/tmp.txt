@@ -143,7 +143,11 @@ type transition =
     write : string;
 }
 
-type machine = (int * transition list) list;
+type state = 
+{
+  id : int;
+  transitions : transition list;
+}
 
 (wow it sure got lighter)
 
