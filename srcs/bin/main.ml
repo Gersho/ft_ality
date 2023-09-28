@@ -44,67 +44,198 @@ let  main () =
     let gmr_file = open_in Sys.argv.(1) in
     let rec parser (accum :full_config) mode count = 
       match String.trim (input_line (gmr_file)) with
+      (* skip empty lines *)
       | "" -> parser accum mode (count + 1);
-      | line when String.equal line "@keyconfig" -> begin
-        parser accum Keyconfig (count + 1); end;
-      | line when String.equal line "@movelist" -> begin
-        parser accum Movelist (count + 1); end;
-      | line when mode == Keyconfig -> begin
-        (* keyconfig parsing
-        -split on :
-        -check for 2 non empty elem
-        -check accum if input not already present
-        -> add to accum or exit syntax error *)
-        (* let key_as_list = String.split_on_char ':' line in *)
-        let duplicate_check  input elem = String.equal elem.input_string input in 
-        match String.split_on_char ':' line with
-        | input :: output when
+      (* switch parsing mode *)
+      | line when String.equal line "@keyconfig" -> begin parser accum Keyconfig (count + 1); end;
+      | line when String.equal line "@movelist" -> begin parser accum Movelist (count + 1); end;
+      (* keyconfig parsing *)
+      | line when mode == Keyconfig ->
+        begin
+          let duplicate_check  input elem = String.equal elem.input_string input in 
+          match String.split_on_char ':' line with
+          | input :: output when
             (List.length output == 1) &&
             (String.length input > 0) &&
             (String.length (List.nth output 0) > 0) &&
             not (List.exists (duplicate_check input) accum.keyconfig)
-            -> begin
-            let new_rec: key = { input_string = input; output_string = List.nth output 0;} in
-            parser { keyconfig = (List.rev_append accum.keyconfig [new_rec]) ; machine = accum.machine ;} Keyconfig (count + 1)
-          end;
-        | _ -> begin
-            print_string "Syntax error on line ";
-            print_int count;
-            print_endline "";
-            exit 3;
-          end;
-      end;(* keyconfig parsing *)
-
-
-
-
+            ->
+            begin
+              let new_rec: key = { input_string = input; output_string = List.nth output 0;} in
+              parser { keyconfig = (List.rev_append accum.keyconfig [new_rec]) ; machine = accum.machine ;} Keyconfig (count + 1)
+            end;
+          | _ ->
+            begin
+              print_string "Syntax error on line ";
+              print_int count;
+              print_endline "";
+              exit 3;
+            end;
+        end;
       (* movelist parsing *)
-      | line when mode == Movelist -> begin
-        (* print_endline "in movelist mode"; *)
-
-        (* 
-        -split on :
-        -check for 2 non empty elem
-            first elem:
-            - check if - is present
-                -> if not, it is 1 action move
-            -split on -
-
-        ...check if  *)
-
-
-        (* let move_as_list = String.split_on_char ':' line in
-        match move_as_list *)
-
-        parser accum Movelist (count + 1);
-      end;(* movelist parsing *)
-
-
-
+      | line when mode == Movelist ->
+        begin
+          match String.split_on_char ':' line with
+          | actions_as_string :: move_name when
+            (List.length move_name == 1) &&
+            (String.length actions_as_string > 0) &&
+            (String.length (List.nth move_name 0) > 0)
+            ->
+            begin
+              print_string "actions : ";
+              print_string actions_as_string;
+              print_string " name : ";
+              print_string (List.nth move_name 0);
+              print_endline "";
+              let is_valid_key action elem = begin String.equal elem.output_string action end; in
+              match String.split_on_char '-' actions_as_string with
+              | head :: tail when
+                (String.length head > 0) &&
+                (List.exists (is_valid_key head) accum.keyconfig)
+                -> begin
 
 
+                  let rec add_move action_head action_tail state_id machine =
+                  begin
+                    match action_head with
+                    |str when 
+                    (String.length str > 0) &&
+                    (List.exists (is_valid_key str) accum.keyconfig)
+                    ->
+                    begin
+                      let rec get_highest_id acc list =
+                        begin
+                          match list with
+                          | [] -> acc
+                          | hd::tl ->
+                            begin
+                              if hd.id > acc then (get_highest_id hd.id tl) else (get_highest_id acc tl)
+                            end;
+                        end;
+                      in 
+                      match List.find_opt (fun el -> state_id == el.id) machine with
+                      | None -> ()
+                      | Some state ->
+                        begin
+                          (* the state where we need to check for transitions *)
+                          match List.find_opt (fun el -> action_head == el.read) state.transitions with
+
+                          (* transition does not exist, add*)
+                          | None -> 
+                            begin
+                              let new_id = get_highest_id 0 machine in
+                              let msg = if (List.length action_tail == 0) then (List.nth move_name 0) else "" in
+                              let new_transition = { read = head; to_state = new_id; write = msg; } in
+                              let updated_current_state = { id = state_id; transitions = (List.rev_append state.transitions [new_transition]); } in
+                              (* val filter : ('a -> bool) -> 'a list -> 'a list
+                              returns the true ones   
+                              *)
+                              let machine_without_current_state = List.filter (fun el -> not (state_id == el.id)) machine in
+                              let new_state = { id = new_id; transitions = [] } in
+                              match action_tail with
+                              | [] -> (List.rev_append machine_without_current_state [new_state])
+                              | h::t -> add_move h t new_id (List.rev_append machine_without_current_state [new_state])
+                            end;
+
+                          (* transition already exists *)
+                          | Some transi when (String.equal transi.write "") ->
+                            begin
+                              match action_tail with
+                              | [] ->
+                                begin
+                                  (* add msg to transition and return new machine*)
+                                  let msg = (List.nth move_name 0) in
+                                  let new_transition = { read = transi.read ; to_state = transi.to_state ; write = msg; } in
+                                  let transitions_without_current_transi = List.filter (fun el ->  not (action_head == el.read)) state.transitions in
+                                  let updated_current_state = { id = state_id; transitions = (List.rev_append transitions_without_current_transi [new_transition]); } in
+                                  let machine_without_current_state = List.filter (fun el -> not (state_id == el.id)) machine in
+                                  List.rev_append machine_without_current_state [updated_current_state]
+                                  (* 
+                                  remove transi from state
+                                  add new transi to state
+                                  add new state to machine   
+                                  
+                                  *)
+                                end;
+                              | h::t -> add_move h t transi.to_state machine
+
+                              (* go to next step *)
+                            end;
+                          | Some transi ->
+                            begin
+                              (* write is not empty, tail not checked yet *)
+                              match action_tail with
+                              | [] ->
+                                begin
+                                  (* no tail, write not empty *)
+                                  (* 2 fully identical action sequences *)
+                                  print_string "Syntax error on line ";
+                                  print_int count;
+                                  print_endline "";
+                                  print_endline "This full action sequence is already present";
+                                  exit 3;
+                                end;
+                              | h::t -> add_move h t transi.to_state machine
+                            end;
+                        end;
+
+
+                      (* match action_tail with
+                      | [] -> new_machine *)
+                      (* check if transi exist, if not add *)
+                        (* if tail empty, is last move add move_name *)
+                          (*  return new machine*)
+                      (* if tail not empty call again *)
+
+
+                    
+                    end;
+                    | _ -> begin
+                      (* requested action (head) has no keybind *)
+                      print_string "Syntax error on line ";
+                      print_int count;
+                      print_endline "";
+                      exit 3;
+                    end;
+                  end;
+                  in
+                  (* state list *)
+                  let updated_machine: state list = add_move head tail 0 accum.machine in
+
+                  parser { keyconfig = accum.keyconfig ; machine = updated_machine ;} Movelist (count + 1)
+                  (* parser accum Movelist (count + 1); *)
+                end;
+
+              
+              | _ ->
+                begin
+                (* requested action (head) has no keybind *)
+                print_string "Syntax error on line ";
+                print_int count;
+                print_endline "";
+                exit 3;
+                end;
+            end;
+          | _ ->
+            begin
+              (* movelist line fail *)
+              print_string "Syntax error on line ";
+              print_int count;
+              print_endline "";
+              exit 3;
+            end;
+        end;(* movelist parsing *)
+
+
+
+
+      | line when mode == Head -> begin
+        (* print header *)
+        (* print_endline line; *)
+        parser accum Head (count + 1);
+      end;
       | _ -> begin
-        parser accum Head (count + 1); 
+        parser accum mode (count + 1); 
       end;
       | exception End_of_file -> (
         print_endline "finished reading the file";
@@ -112,7 +243,7 @@ let  main () =
         accum)
     in
     (* let result: full_config = parser full_config, parsing_mode, line_count *)
-    let result = parser { keyconfig = [] ; machine = [];} Head 1
+    let result = parser { keyconfig = [] ; machine = [ { id = 0; transitions = [] } ];} Head 1
     in
 
 
