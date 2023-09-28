@@ -72,7 +72,16 @@ let  main () =
               exit 3;
             end;
         end;
+
+
+
+
+
+        (* | line when mode == Movelist ->
+          parser accum Movelist (count + 1) *)
+
       (* movelist parsing *)
+
       | line when mode == Movelist ->
         begin
           match String.split_on_char ':' line with
@@ -82,19 +91,17 @@ let  main () =
             (String.length (List.nth move_name 0) > 0)
             ->
             begin
-              print_string "actions : ";
+              (* print_string "actions : ";
               print_string actions_as_string;
               print_string " name : ";
               print_string (List.nth move_name 0);
-              print_endline "";
+              print_endline ""; *)
               let is_valid_key action elem = begin String.equal elem.output_string action end; in
               match String.split_on_char '-' actions_as_string with
               | head :: tail when
                 (String.length head > 0) &&
                 (List.exists (is_valid_key head) accum.keyconfig)
                 -> begin
-
-
                   let rec add_move action_head action_tail state_id machine =
                   begin
                     match action_head with
@@ -103,67 +110,70 @@ let  main () =
                     (List.exists (is_valid_key str) accum.keyconfig)
                     ->
                     begin
-                      let rec get_highest_id acc list =
+                      let rec get_new_id acc list =
                         begin
                           match list with
-                          | [] -> acc
+                          | [] -> (acc + 1)
                           | hd::tl ->
                             begin
-                              if hd.id > acc then (get_highest_id hd.id tl) else (get_highest_id acc tl)
+                              if hd.id > acc then (get_new_id hd.id tl) else (get_new_id acc tl)
                             end;
                         end;
                       in 
                       match List.find_opt (fun el -> state_id == el.id) machine with
-                      | None -> ()
+                      | None -> 
+                        begin
+                          print_string "Something went very wrong trying to parse line ";
+                          print_int count;
+                          print_endline " (should never display)";
+                          exit 4;
+                        end;
                       | Some state ->
                         begin
-                          (* the state where we need to check for transitions *)
-                          match List.find_opt (fun el -> action_head == el.read) state.transitions with
-
-                          (* transition does not exist, add*)
-                          | None -> 
+                          let test = 
                             begin
-                              let new_id = get_highest_id 0 machine in
+                              List.find_opt (fun el ->  String.equal action_head el.read) state.transitions 
+                            end; in
+                          match test with
+                          | None -> 
+                            (* state has no transition for action_head *)
+                            (* need to add new transition to updated current state *)
+                            (* need to add new state to machine *)
+                            begin
+                              (* print_string "at L 139 ";
+                              print_int state_id;
+                              print_endline ""; *)
+                              let new_id = get_new_id 0 machine in
                               let msg = if (List.length action_tail == 0) then (List.nth move_name 0) else "" in
-                              let new_transition = { read = head; to_state = new_id; write = msg; } in
+                              let new_transition = { read = action_head; to_state = new_id; write = msg; } in
                               let updated_current_state = { id = state_id; transitions = (List.rev_append state.transitions [new_transition]); } in
-                              (* val filter : ('a -> bool) -> 'a list -> 'a list
-                              returns the true ones   
-                              *)
                               let machine_without_current_state = List.filter (fun el -> not (state_id == el.id)) machine in
+                              let machine_with_updated_state = List.rev_append machine_without_current_state [updated_current_state] in
                               let new_state = { id = new_id; transitions = [] } in
                               match action_tail with
-                              | [] -> (List.rev_append machine_without_current_state [new_state])
-                              | h::t -> add_move h t new_id (List.rev_append machine_without_current_state [new_state])
+                              | [] -> List.rev_append machine_with_updated_state [new_state]
+                              | h::t -> add_move h t new_id (List.rev_append machine_with_updated_state [new_state])
                             end;
-
-                          (* transition already exists *)
                           | Some transi when (String.equal transi.write "") ->
                             begin
                               match action_tail with
                               | [] ->
+                                (* transition exists for action_head in current state *)
+                                (* need to add new transition to updated current state *)
+                                (* need to update machine with updated state *)
+                                (* no msg + no tail -> set message *)
                                 begin
-                                  (* add msg to transition and return new machine*)
                                   let msg = (List.nth move_name 0) in
                                   let new_transition = { read = transi.read ; to_state = transi.to_state ; write = msg; } in
                                   let transitions_without_current_transi = List.filter (fun el ->  not (action_head == el.read)) state.transitions in
                                   let updated_current_state = { id = state_id; transitions = (List.rev_append transitions_without_current_transi [new_transition]); } in
                                   let machine_without_current_state = List.filter (fun el -> not (state_id == el.id)) machine in
                                   List.rev_append machine_without_current_state [updated_current_state]
-                                  (* 
-                                  remove transi from state
-                                  add new transi to state
-                                  add new state to machine   
-                                  
-                                  *)
                                 end;
                               | h::t -> add_move h t transi.to_state machine
-
-                              (* go to next step *)
                             end;
                           | Some transi ->
                             begin
-                              (* write is not empty, tail not checked yet *)
                               match action_tail with
                               | [] ->
                                 begin
@@ -178,17 +188,6 @@ let  main () =
                               | h::t -> add_move h t transi.to_state machine
                             end;
                         end;
-
-
-                      (* match action_tail with
-                      | [] -> new_machine *)
-                      (* check if transi exist, if not add *)
-                        (* if tail empty, is last move add move_name *)
-                          (*  return new machine*)
-                      (* if tail not empty call again *)
-
-
-                    
                     end;
                     | _ -> begin
                       (* requested action (head) has no keybind *)
@@ -201,7 +200,6 @@ let  main () =
                   in
                   (* state list *)
                   let updated_machine: state list = add_move head tail 0 accum.machine in
-
                   parser { keyconfig = accum.keyconfig ; machine = updated_machine ;} Movelist (count + 1)
                   (* parser accum Movelist (count + 1); *)
                 end;
@@ -224,7 +222,9 @@ let  main () =
               print_endline "";
               exit 3;
             end;
-        end;(* movelist parsing *)
+        end;
+
+        (* movelist parsing end*)
 
 
 
@@ -243,9 +243,12 @@ let  main () =
         accum)
     in
     (* let result: full_config = parser full_config, parsing_mode, line_count *)
-    let result = parser { keyconfig = [] ; machine = [ { id = 0; transitions = [] } ];} Head 1
-    in
-
+    let result = parser { keyconfig = [] ; machine = [ { id = 0; transitions = [] } ];} Head 1 in
+    (* final sort to enable use of List.nth (and readability of debug)*)
+    
+    let final_parsed = 
+      let machine_sorted = List.sort (fun a b -> compare a.id b.id) result.machine in
+      { keyconfig = result.keyconfig; machine = machine_sorted } in
 
     (* debug print *)
     print_endline "debug print: ";
@@ -259,9 +262,9 @@ let  main () =
         print_endline elem.output_string;
       end;
     in
-    List.iter print_keyconf result.keyconfig;
+    List.iter print_keyconf final_parsed.keyconfig;
 
-    print_endline "movelist: ";
+    print_endline "machine: ";
     let print_transition (elem: transition)= 
       begin
         print_string "     read: ";
@@ -279,7 +282,7 @@ let  main () =
         List.iter print_transition elem.transitions;
       end;
     in
-    List.iter print_state result.machine;
+    List.iter print_state final_parsed.machine;
 
   with e ->
     raise e
