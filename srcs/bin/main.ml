@@ -161,7 +161,6 @@ let  main () =
                               | h::t -> add_move h t transi.to_state machine
                             end;
                         end;
-            (* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ *)
                     end;
                     | _ -> begin
                       (* requested action (head) has no keybind  (2nd+)*)
@@ -177,10 +176,7 @@ let  main () =
                   (* state list *)
                   let updated_machine: state list = add_move head tail 0 accum.machine in
                   parser { keyconfig = accum.keyconfig ; machine = updated_machine ;} Movelist (count + 1)
-                  (* parser accum Movelist (count + 1); *)
                 end;
-
-              
               | head :: tail ->
                 begin
                 (* requested action (head) has no keybind (1st)*)
@@ -207,16 +203,10 @@ let  main () =
               print_endline "";
               exit 3;
             end;
-        end;
-
-        (* movelist parsing end*)
-
-
-
-
+        end; (* movelist parsing end*)
       | line when mode == Head -> begin
         (* print header *)
-        (* print_endline line; *)
+        print_endline line;
         parser accum Head (count + 1);
       end;
       | _ -> begin
@@ -227,17 +217,13 @@ let  main () =
         close_in gmr_file;
         accum)
     in
-    (* let result: full_config = parser full_config, parsing_mode, line_count *)
     let result = parser { keyconfig = [] ; machine = [ { id = 0; transitions = [] } ];} Head 1 in
-    (* final sort to enable use of List.nth (and readability of debug)*)
-    
     let final_parsed = 
       let machine_sorted = List.sort (fun a b -> compare a.id b.id) result.machine in
       { keyconfig = result.keyconfig; machine = machine_sorted } in
 
     (* debug print *)
     print_endline "debug print: ";
-
     print_endline "keyconf: ";
     let print_keyconf (elem: key) = 
       begin
@@ -248,7 +234,6 @@ let  main () =
       end;
     in
     List.iter print_keyconf final_parsed.keyconfig;
-
     print_endline "machine: ";
     let print_transition (elem: transition)= 
       begin
