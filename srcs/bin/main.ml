@@ -72,16 +72,7 @@ let  main () =
               exit 3;
             end;
         end;
-
-
-
-
-
-        (* | line when mode == Movelist ->
-          parser accum Movelist (count + 1) *)
-
       (* movelist parsing *)
-
       | line when mode == Movelist ->
         begin
           match String.split_on_char ':' line with
@@ -91,11 +82,6 @@ let  main () =
             (String.length (List.nth move_name 0) > 0)
             ->
             begin
-              (* print_string "actions : ";
-              print_string actions_as_string;
-              print_string " name : ";
-              print_string (List.nth move_name 0);
-              print_endline ""; *)
               let is_valid_key action elem = begin String.equal elem.output_string action end; in
               match String.split_on_char '-' actions_as_string with
               | head :: tail when
@@ -130,19 +116,10 @@ let  main () =
                         end;
                       | Some state ->
                         begin
-                          let test = 
-                            begin
-                              List.find_opt (fun el ->  String.equal action_head el.read) state.transitions 
-                            end; in
-                          match test with
+                          match List.find_opt (fun el ->  String.equal action_head el.read) state.transitions with
                           | None -> 
                             (* state has no transition for action_head *)
-                            (* need to add new transition to updated current state *)
-                            (* need to add new state to machine *)
                             begin
-                              (* print_string "at L 139 ";
-                              print_int state_id;
-                              print_endline ""; *)
                               let new_id = get_new_id 0 machine in
                               let msg = if (List.length action_tail == 0) then (List.nth move_name 0) else "" in
                               let new_transition = { read = action_head; to_state = new_id; write = msg; } in
@@ -158,10 +135,6 @@ let  main () =
                             begin
                               match action_tail with
                               | [] ->
-                                (* transition exists for action_head in current state *)
-                                (* need to add new transition to updated current state *)
-                                (* need to update machine with updated state *)
-                                (* no msg + no tail -> set message *)
                                 begin
                                   let msg = (List.nth move_name 0) in
                                   let new_transition = { read = transi.read ; to_state = transi.to_state ; write = msg; } in
@@ -188,12 +161,15 @@ let  main () =
                               | h::t -> add_move h t transi.to_state machine
                             end;
                         end;
+            (* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ *)
                     end;
                     | _ -> begin
-                      (* requested action (head) has no keybind *)
+                      (* requested action (head) has no keybind  (2nd+)*)
                       print_string "Syntax error on line ";
                       print_int count;
-                      print_endline "";
+                      print_string " action: ";
+                      print_string action_head;
+                      print_endline " has no corresponding keybind";
                       exit 3;
                     end;
                   end;
@@ -205,13 +181,22 @@ let  main () =
                 end;
 
               
-              | _ ->
+              | head :: tail ->
                 begin
-                (* requested action (head) has no keybind *)
+                (* requested action (head) has no keybind (1st)*)
                 print_string "Syntax error on line ";
                 print_int count;
-                print_endline "";
+                print_string " action: ";
+                print_string head;
+                print_endline " has no corresponding keybind";
                 exit 3;
+                end;
+              | _ ->
+                begin
+                  print_string "Syntax error on line ";
+                  print_int count;
+                  print_endline "";
+                  exit 3;
                 end;
             end;
           | _ ->
