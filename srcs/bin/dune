@@ -3,7 +3,7 @@
  (name main)
  (libraries
  ft_ality
-  sdl
+  ; sdl
  )
   (flags (-w -69))
  )
