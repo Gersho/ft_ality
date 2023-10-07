@@ -2,10 +2,9 @@
  (public_name ft_ality)
  (name main)
  (libraries
- ft_ality
+  ft_ality
   ; sdl
- )
-  (flags (-w -69))
- )
-
- ; (flags (-w -69))
+  )
+ (flags
+  (-w -69))
+ (modules main parser types))
