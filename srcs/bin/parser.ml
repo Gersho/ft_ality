@@ -3,9 +3,11 @@ type parsing_mode =
   | Keyconfig
   | Movelist
 
-let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
+let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
   let parse_key (accum : Types.full_config) line count =
-    let duplicate_check input (elem : Types.key) = String.equal elem.input_string input in
+    let duplicate_check input (elem : Types.key) =
+      String.equal elem.input_string input
+    in
     match String.split_on_char ':' line with
     | input :: output
       when List.length output == 1
@@ -16,7 +18,7 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
         { input_string = input; output_string = List.nth output 0 }
       in
       parse
-        gmr_file
+        ic
         { keyconfig = List.rev_append accum.keyconfig [ new_rec ]
         ; machine = accum.machine
         }
@@ -27,19 +29,7 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
       print_int count;
       print_endline "";
       exit 3
-  in
-  match String.trim (input_line gmr_file) with
-  (* skip empty lines *)
-  | "" -> parse gmr_file accum mode (count + 1)
-  (* switch parsing mode *)
-  | line when String.equal line "@keyconfig" ->
-    parse gmr_file accum Keyconfig (count + 1)
-  | line when String.equal line "@movelist" ->
-    parse gmr_file accum Movelist (count + 1)
-  (* keyconfig parsing *)
-  | line when mode == Keyconfig -> parse_key accum line count
-  (* movelist parsing *)
-  | line when mode == Movelist -> (
+  and parse_transition (accum : Types.full_config) line count =
     match String.split_on_char ':' line with
     | actions_as_string :: move_name
       when List.length move_name == 1
@@ -52,7 +42,8 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
       | head :: tail
         when String.length head > 0
              && List.exists (is_valid_key head) accum.keyconfig ->
-        let rec add_move action_head action_tail state_id (machine : Types.machine) =
+        let rec add_move action_head action_tail state_id
+            (machine : Types.machine) =
           match action_head with
           | str
             when String.length str > 0
@@ -61,10 +52,13 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
               match list with
               | [] -> acc + 1
               | hd :: tl ->
-                if hd.id > acc then get_new_id hd.id tl
-                else get_new_id acc tl
+                if hd.id > acc then get_new_id hd.id tl else get_new_id acc tl
             in
-            match List.find_opt (fun (el : Types.state) -> state_id == el.id) machine with
+            match
+              List.find_opt
+                (fun (el : Types.state) -> state_id == el.id)
+                machine
+            with
             | None ->
               print_string "Something went very wrong trying to parse line ";
               print_int count;
@@ -73,7 +67,8 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
             | Some state -> (
               match
                 List.find_opt
-                  (fun (el : Types.transition) -> String.equal action_head el.read)
+                  (fun (el : Types.transition) ->
+                    String.equal action_head el.read)
                   state.transitions
               with
               | None -> (
@@ -93,25 +88,26 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
                   }
                 in
                 let machine_without_current_state =
-                  List.filter (fun (el : Types.state) -> not (state_id == el.id)) machine
+                  List.filter
+                    (fun (el : Types.state) -> not (state_id == el.id))
+                    machine
                 in
                 let machine_with_updated_state =
                   List.rev_append
                     machine_without_current_state
                     [ updated_current_state ]
                 in
-                let new_state : Types.state = { id = new_id; transitions = [] } in
+                let new_state : Types.state =
+                  { id = new_id; transitions = [] }
+                in
                 match action_tail with
-                | [] ->
-                  List.rev_append machine_with_updated_state [ new_state ]
+                | [] -> List.rev_append machine_with_updated_state [ new_state ]
                 | h :: t ->
                   add_move
                     h
                     t
                     new_id
-                    (List.rev_append
-                       machine_with_updated_state
-                       [ new_state ]))
+                    (List.rev_append machine_with_updated_state [ new_state ]))
               | Some transi when String.equal transi.write "" -> (
                 match action_tail with
                 | [] ->
@@ -122,9 +118,11 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
                     ; write = msg
                     }
                   in
-                  let transitions_without_current_transi : Types.transition list =
+                  let transitions_without_current_transi : Types.transition list
+                      =
                     List.filter
-                      (fun (el : Types.transition) -> not (action_head == el.read))
+                      (fun (el : Types.transition) ->
+                        not (action_head == el.read))
                       state.transitions
                   in
                   let updated_current_state : Types.state =
@@ -136,7 +134,9 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
                     }
                   in
                   let machine_without_current_state : Types.machine =
-                    List.filter (fun (el : Types.state) -> not (state_id == el.id)) machine
+                    List.filter
+                      (fun (el : Types.state) -> not (state_id == el.id))
+                      machine
                   in
                   List.rev_append
                     machine_without_current_state
@@ -150,8 +150,7 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
                   print_string "Syntax error on line ";
                   print_int count;
                   print_endline "";
-                  print_endline
-                    "This full action sequence is already present";
+                  print_endline "This full action sequence is already present";
                   exit 3
                 | h :: t -> add_move h t transi.to_state machine)))
           | _ ->
@@ -168,7 +167,7 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
           add_move head tail 0 accum.machine
         in
         parse
-          gmr_file
+          ic
           { keyconfig = accum.keyconfig; machine = updated_machine }
           Movelist
           (count + 1)
@@ -190,14 +189,20 @@ let rec parse (gmr_file : in_channel) (accum : Types.full_config) mode count =
       print_string "Syntax error on line ";
       print_int count;
       print_endline "";
-      exit 3)
-  (* movelist parsing end*)
+      exit 3
+  in
+  match String.trim (input_line ic) with
+  | "" -> parse ic accum mode (count + 1) (* skip empty lines *)
+  | line when String.equal line "@keyconfig" ->
+    parse ic accum Keyconfig (count + 1)
+  | line when String.equal line "@movelist" ->
+    parse ic accum Movelist (count + 1)
+  | line when mode == Keyconfig -> parse_key accum line count
+  | line when mode == Movelist -> parse_transition accum line count
   | line when mode == Head ->
-    (* print header *)
     (* print_endline line; *)
-    parse gmr_file accum Head (count + 1)
-  | _ -> parse gmr_file accum mode (count + 1)
+    parse ic accum Head (count + 1)
+  | _ -> parse ic accum mode (count + 1)
   | exception End_of_file ->
-    print_endline "finished reading the file";
-    close_in gmr_file;
+    close_in ic;
     accum
