@@ -4,16 +4,16 @@ type parsing_mode =
   | Movelist
 
 let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
-  let parse_key (accum : Types.full_config) line count =
-    let duplicate_check input (elem : Types.key) =
-      String.equal elem.input_string input
-    in
-    match String.split_on_char ':' line with
+  let parse_key = function
     | input :: output
       when List.length output == 1
            && String.length input > 0
            && String.length (List.nth output 0) > 0
-           && not (List.exists (duplicate_check input) accum.keyconfig) ->
+           && not
+                (List.exists
+                   (fun (key : Types.key) ->
+                     String.equal key.input_string input)
+                   accum.keyconfig) ->
       let new_rec : Types.key =
         { input_string = input; output_string = List.nth output 0 }
       in
@@ -29,8 +29,7 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
       print_int count;
       print_endline "";
       exit 3
-  and parse_transition (accum : Types.full_config) line count =
-    match String.split_on_char ':' line with
+  and parse_transition = function
     | actions_as_string :: move_name
       when List.length move_name == 1
            && String.length actions_as_string > 0
@@ -193,14 +192,12 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
   in
   match String.trim (input_line ic) with
   | "" -> parse ic accum mode (count + 1) (* skip empty lines *)
-  | line when String.equal line "@keyconfig" ->
-    parse ic accum Keyconfig (count + 1)
-  | line when String.equal line "@movelist" ->
-    parse ic accum Movelist (count + 1)
-  | line when mode == Keyconfig -> parse_key accum line count
-  | line when mode == Movelist -> parse_transition accum line count
-  | line when mode == Head ->
-    (* print_endline line; *)
+  | l when String.equal l "@keyconfig" -> parse ic accum Keyconfig (count + 1)
+  | l when String.equal l "@movelist" -> parse ic accum Movelist (count + 1)
+  | l when mode == Keyconfig -> parse_key (String.split_on_char ':' l)
+  | l when mode == Movelist -> parse_transition (String.split_on_char ':' l)
+  | l when mode == Head ->
+    (* print_endline l; *)
     parse ic accum Head (count + 1)
   | _ -> parse ic accum mode (count + 1)
   | exception End_of_file ->
