@@ -7,4 +7,5 @@
   )
  (flags
   (-w -69))
- (modules main parser types))
+ (modules main parser types)
+ (modules_without_implementation types))

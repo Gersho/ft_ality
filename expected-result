@@ -1,7 +1,6 @@
 dune build
 ./_build/install/default/bin/ft_ality ./grammar/SF_Ryu.gmr
 Opening file: ./grammar/SF_Ryu.gmr
-finished reading the file
 debug print: 
 keyconf: 
 key.input: s key.output: MK
