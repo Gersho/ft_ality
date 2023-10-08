@@ -134,15 +134,7 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
                 accum.machine
           }
         in
-        parse ic new_config Movelist (count + 1)
-      (* | head :: tail ->
-         (* requested action (head) has no keybind (1st)*)
-         print_string "Syntax error on line ";
-         print_int count;
-         print_string " action: ";
-         print_string head;
-         print_endline " has no corresponding keybind";
-         exit 3 *))
+        parse ic new_config Movelist (count + 1))
     | _ ->
       print_string "Syntax error on line ";
       print_int count;
