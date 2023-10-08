@@ -9,7 +9,7 @@ doc-comments=before
 field-space=loose
 sequence-style=terminator
 type-decl=sparse
-wrap-comments=true
+wrap-comments=false
 let-and=sparse
 space-around-records
 space-around-lists
