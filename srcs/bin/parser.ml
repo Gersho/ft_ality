@@ -127,7 +127,11 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
               exit 3
           in
           { keyconfig = accum.keyconfig
-          ; machine = add_move actions (List.nth accum.machine 0) accum.machine
+          ; machine =
+              add_move
+                actions
+                (List.find (fun (e : Types.state) -> e.id == 0) accum.machine)
+                accum.machine
           }
         in
         parse ic new_config Movelist (count + 1)
