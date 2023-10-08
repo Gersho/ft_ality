@@ -1,0 +1,8 @@
+@keyconfig
+1:1
+2:2
+3:3
+@movelist
+1-2:One Two
+1:One
+2:Two

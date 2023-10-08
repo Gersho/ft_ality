@@ -19,7 +19,9 @@ let main () =
     in
     let final_parsed : Types.full_config =
       let machine_sorted =
-        List.sort (fun (a : Types.state) (b : Types.state) -> compare a.id b.id) result.machine
+        List.sort
+          (fun (a : Types.state) (b : Types.state) -> compare a.id b.id)
+          result.machine
       in
       { keyconfig = result.keyconfig; machine = machine_sorted }
     in
@@ -53,14 +55,19 @@ let main () =
 
     print_endline "#### START MACHINE ####";
     let hardcoded_test =
-      [ "2"; "3"; "6"; "MP"; "LP"; "LP"; "1"; "2"; "3"; "6"; "1" ]
+      (* [ "2"; "3"; "6"; "MP"; "LP"; "LP"; "1"; "2"; "3"; "6"; "1" ] *)
+      [ "1"; "2"; "2"; "1" ]
     in
     let rec machine_test state count =
       (* print_string "current state: "; print_int state; print_string " next
          input is: "; print_endline (List.nth hardcoded_test count); *)
       let input = List.nth hardcoded_test count in
       let a = (List.nth final_parsed.machine state).transitions in
-      match List.find_opt (fun (el : Types.transition) -> String.equal input el.read) a with
+      match
+        List.find_opt
+          (fun (el : Types.transition) -> String.equal input el.read)
+          a
+      with
       | None ->
         print_string "input: ";
         print_string input;

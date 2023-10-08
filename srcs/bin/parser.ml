@@ -48,6 +48,30 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
           let rec add_move actions (state : Types.state) machine =
             let get_state id =
               List.find (fun (s : Types.state) -> s.id == id) machine
+            and get_max_id =
+              List.fold_left (fun a (b : Types.state) -> max a b.id) 0 machine
+            and update_state (machine : Types.machine) (state : Types.state) :
+                Types.machine =
+              List.rev_map
+                (fun (a : Types.state) -> if a.id == state.id then state else a)
+                machine
+            and add_state (state : Types.state) (machine : Types.machine) :
+                Types.machine =
+              List.rev_append machine [ state ]
+            and update_state_transition (state : Types.state)
+                (transition : Types.transition) : Types.state =
+              { id = state.id
+              ; transitions =
+                  List.rev_map
+                    (fun (a : Types.transition) ->
+                      if a.read == transition.read then transition else a)
+                    state.transitions
+              }
+            and add_state_transition (state : Types.state)
+                (transition : Types.transition) : Types.state =
+              { id = state.id
+              ; transitions = List.rev_append state.transitions [ transition ]
+              }
             in
             match actions with
             | head :: tail when key_exists head -> (
@@ -59,63 +83,27 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
               | None ->
                 (* state has no transition for action_head *)
                 let new_state : Types.state =
-                  let new_id =
-                    List.fold_left
-                      (fun a (b : Types.state) -> max a b.id)
-                      0
-                      machine
-                    + 1
-                  in
-                  { id = new_id; transitions = [] }
+                  { id = get_max_id + 1; transitions = [] }
                 in
-                let machine =
-                  let state : Types.state =
-                    let new_transition : Types.transition =
-                      let msg =
-                        if List.length tail == 0 then move_name else ""
-                      in
-                      { read = head; to_state = new_state.id; write = msg }
-                    in
-                    { id = state.id
-                    ; transitions =
-                        List.rev_append state.transitions [ new_transition ]
-                    }
-                  in
-                  List.rev_append
-                    (List.rev_map
-                       (fun (a : Types.state) ->
-                         if a.id == state.id then state else a)
-                       machine)
-                    [ new_state ]
+                let new_transition : Types.transition =
+                  { read = head
+                  ; to_state = new_state.id
+                  ; write = (if List.length tail == 0 then move_name else "")
+                  }
                 in
-                add_move tail new_state machine
+                add_state_transition state new_transition
+                |> update_state machine |> add_state new_state
+                |> add_move tail new_state
               | Some transition when String.equal transition.write "" -> (
                 match tail with
                 | [] ->
-                  let state : Types.state =
-                    let transition : Types.transition =
-                      { read = transition.read
-                      ; to_state = transition.to_state
-                      ; write = move_name
-                      }
-                    in
-                    { id = state.id
-                    ; transitions =
-                      List.rev_map
-                      (fun (a : Types.transition) ->
-                        if a.read == transition.read then transition else a)
-                      state.transitions
+                  update_state_transition
+                    state
+                    { read = transition.read
+                    ; to_state = transition.to_state
+                    ; write = move_name
                     }
-                  in
-                  (* Repeat without add *)
-                  let machine =
-                    List.rev_map
-                      (fun (a : Types.state) ->
-                        if a.id == state.id then state else a)
-                      machine
-                  in
-                  (* Repeat *)
-                  machine
+                  |> update_state machine
                 | _ -> add_move tail (get_state transition.to_state) machine)
               | Some transition -> (
                 match tail with
@@ -127,7 +115,8 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
                   print_endline "";
                   print_endline "This full action sequence is already present";
                   exit 3
-                | h :: t -> add_move tail (get_state transition.to_state) machine))
+                | h :: t ->
+                  add_move tail (get_state transition.to_state) machine))
             | [] -> machine
             | _ ->
               print_string "Syntax error on line ";
@@ -158,8 +147,8 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
   in
   match String.trim (input_line ic) with
   | "" -> parse ic accum mode (count + 1) (* skip empty lines *)
-  | l when String.equal l "@keyconfig" -> parse ic accum Keyconfig (count + 1)
-  | l when String.equal l "@movelist" -> parse ic accum Movelist (count + 1)
+  | "@keyconfig" -> parse ic accum Keyconfig (count + 1)
+  | "@movelist" -> parse ic accum Movelist (count + 1)
   | l when mode == Keyconfig -> parse_key (String.split_on_char ':' l)
   | l when mode == Movelist -> parse_transition (String.split_on_char ':' l)
   | l when mode == Head ->
