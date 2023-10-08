@@ -4,26 +4,26 @@ type parsing_mode =
   | Movelist
 
 let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
-  let parse_key = function
-    | input :: output
-      when List.length output == 1
-           && String.length input > 0
-           && String.length (List.nth output 0) > 0
-           && not
-                (List.exists
-                   (fun (key : Types.key) ->
-                     String.equal key.input_string input)
-                   accum.keyconfig) ->
-      let new_rec : Types.key =
+  let parse_key =
+    let is_valid_to_add (input : string) (output : string list) =
+      List.length output == 1
+      && String.length input > 0
+      && String.length (List.nth output 0) > 0
+      && not
+           (List.exists
+              (fun (key : Types.key) -> String.equal key.input_string input)
+              accum.keyconfig)
+    and append_key (input : string) (output : string list) : Types.full_config =
+      let new_key : Types.key =
         { input_string = input; output_string = List.nth output 0 }
       in
-      parse
-        ic
-        { keyconfig = List.rev_append accum.keyconfig [ new_rec ]
-        ; machine = accum.machine
-        }
-        Keyconfig
-        (count + 1)
+      { keyconfig = List.rev_append accum.keyconfig [ new_key ]
+      ; machine = accum.machine
+      }
+    in
+    function
+    | input :: output when is_valid_to_add input output ->
+      parse ic (append_key input output) Keyconfig (count + 1)
     | _ ->
       print_string "Syntax error on line ";
       print_int count;
