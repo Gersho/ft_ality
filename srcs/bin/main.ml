@@ -11,17 +11,11 @@ let main () =
   try
     let gmr_file = open_in Sys.argv.(1) in
     let result =
-      Parser.parse
-        gmr_file
-        { keyconfig = []; machine = [ { id = 0; transitions = [] } ] }
-        Head
-        1
+      Parser.parse gmr_file { keyconfig = []; machine = [{ id = 0; transitions = [] }] } Head 1
     in
     let final_parsed : Types.full_config =
       let machine_sorted =
-        List.sort
-          (fun (a : Types.state) (b : Types.state) -> compare a.id b.id)
-          result.machine
+        List.sort (fun (a : Types.state) (b : Types.state) -> compare a.id b.id) result.machine
       in
       { keyconfig = result.keyconfig; machine = machine_sorted }
     in
@@ -55,46 +49,44 @@ let main () =
 
     print_endline "#### START MACHINE ####";
     let hardcoded_test =
-      [ "2"; "3"; "6"; "MP"; "LP"; "LP"; "1"; "2"; "3"; "6"; "1" ]
+      ["2"; "3"; "6"; "MP"; "LP"; "LP"; "1"; "2"; "3"; "6"; "1"]
       (* [ "1"; "2"; "2"; "1"; "1" ] *)
     in
     let rec machine_test state count =
-      (* print_string "current state: "; print_int state; print_string " next
-         input is: "; print_endline (List.nth hardcoded_test count); *)
+      (* print_string "current state: "; print_int state; print_string " next input is: ";
+         print_endline (List.nth hardcoded_test count); *)
       if count < List.length hardcoded_test then
         let input = List.nth hardcoded_test count in
         let a = (List.nth final_parsed.machine state).transitions in
-        match
-          List.find_opt
-            (fun (el : Types.transition) -> String.equal input el.read)
-            a
-        with
+        match List.find_opt (fun (el : Types.transition) -> String.equal input el.read) a with
         | None ->
-          print_string "input: ";
-          print_string input;
-          print_string " has no follow-up in state: ";
-          print_int state;
-          print_endline " -> going back to state 0";
-          machine_test 0 (count + 1)
+            print_string "input: ";
+            print_string input;
+            print_string " has no follow-up in state: ";
+            print_int state;
+            print_endline " -> going back to state 0";
+            machine_test 0 (count + 1)
         | Some transi -> (
-          print_string "input: ";
-          print_string input;
-          print_string " has a follow-up in state: ";
-          print_int state;
-          print_string " pointing to state ";
-          print_int transi.to_state;
-          print_endline "";
+            print_string "input: ";
+            print_string input;
+            print_string " has a follow-up in state: ";
+            print_int state;
+            print_string " pointing to state ";
+            print_int transi.to_state;
+            print_endline "";
 
-          match transi.write with
-          | "" ->
-            print_endline "<not a move, writing nothing>";
-            machine_test transi.to_state (count + 1)
-          | str ->
-            print_string "move found, writing: ";
-            print_endline transi.write;
-            machine_test transi.to_state (count + 1))
+            match transi.write with
+            | "" ->
+                print_endline "<not a move, writing nothing>";
+                machine_test transi.to_state (count + 1)
+            | str ->
+                print_string "move found, writing: ";
+                print_endline transi.write;
+                machine_test transi.to_state (count + 1))
     in
     machine_test 0 0
-  with e -> raise e
+  with
+  | e -> raise e
+
 
 let () = main ()
