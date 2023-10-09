@@ -76,23 +76,23 @@ let main () =
           print_int state;
           print_endline " -> going back to state 0";
           machine_test 0 (count + 1)
-        | Some transi ->
-          (print_string "input: ";
-           print_string input;
-           print_string " has a follow-up in state: ";
-           print_int state;
-           print_string " pointing to state ";
-           print_int transi.to_state;
-           print_endline "";
+        | Some transi -> (
+          print_string "input: ";
+          print_string input;
+          print_string " has a follow-up in state: ";
+          print_int state;
+          print_string " pointing to state ";
+          print_int transi.to_state;
+          print_endline "";
 
-           match transi.write with
-           | "" ->
-             print_endline "<not a move, writing nothing>";
-             machine_test transi.to_state (count + 1)
-           | str ->
-             print_string "move found, writing: ";
-             print_endline transi.write;
-             machine_test transi.to_state (count + 1));
+          match transi.write with
+          | "" ->
+            print_endline "<not a move, writing nothing>";
+            machine_test transi.to_state (count + 1)
+          | str ->
+            print_string "move found, writing: ";
+            print_endline transi.write;
+            machine_test transi.to_state (count + 1))
     in
     machine_test 0 0
   with e -> raise e

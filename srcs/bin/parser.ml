@@ -3,16 +3,26 @@ type parsing_mode =
   | Keyconfig
   | Movelist
 
-let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
+type full_config = Types.full_config
+
+type state = Types.state
+
+type transition = Types.transition
+
+type key = Types.key
+
+type machine = Types.machine
+
+let rec parse (ic : in_channel) (accum : full_config) mode count =
   let parse_key =
     let is_valid_to_add (input : string) (output : string) =
       String.length input > 0
       && String.length output > 0
       && not
            (List.exists
-              (fun (key : Types.key) -> String.equal key.input_string input)
+              (fun (key : key) -> String.equal key.input_string input)
               accum.keyconfig)
-    and append_key (input : string) (output : string) : Types.full_config =
+    and append_key (input : string) (output : string) : full_config =
       { keyconfig =
           List.rev_append
             accum.keyconfig
@@ -34,7 +44,7 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
       -> (
       let key_exists output =
         List.exists
-          (fun (el : Types.key) -> String.equal el.output_string output)
+          (fun (el : key) -> String.equal el.output_string output)
           accum.keyconfig
       in
       match String.split_on_char '-' actions_as_string with
@@ -44,65 +54,54 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
         print_endline "";
         exit 3
       | actions ->
-        let new_config : Types.full_config =
-          let rec add_move actions (state : Types.state) machine =
-            let get_state id =
-              List.find (fun (s : Types.state) -> s.id == id) machine
+        let new_config : full_config =
+          let rec add_move actions (state : state) machine =
+            let get_state id = List.find (fun (s : state) -> s.id == id) machine
             and get_max_id =
-              List.fold_left (fun a (b : Types.state) -> max a b.id) 0 machine
-            and update_state (machine : Types.machine) (state : Types.state) :
-                Types.machine =
+              List.fold_left (fun a (b : state) -> max a b.id) 0 machine
+            and update_state (machine : machine) (state : state) : machine =
               List.rev_map
-                (fun (a : Types.state) -> if a.id == state.id then state else a)
+                (fun (a : state) -> if a.id == state.id then state else a)
                 machine
-            and add_state (state : Types.state) (machine : Types.machine) :
-                Types.machine =
-              List.rev_append machine [ state ]
-            and update_state_transition (state : Types.state)
-                (transition : Types.transition) : Types.state =
+            and update_state_transition (state : state)
+                (transition : transition) : state =
               { id = state.id
               ; transitions =
                   List.rev_map
-                    (fun (a : Types.transition) ->
+                    (fun (a : transition) ->
                       if a.read == transition.read then transition else a)
                     state.transitions
               }
-            and add_state_transition (state : Types.state)
-                (transition : Types.transition) : Types.state =
+            and with_state (state : state) (machine : machine) : machine =
+              List.rev_append machine [ state ]
+            and with_transition (state : state) (transition : transition) :
+                state =
               { id = state.id
               ; transitions = List.rev_append state.transitions [ transition ]
               }
+            and new_transition read to_state write : transition =
+              { read; to_state; write }
             in
             match actions with
             | head :: tail when key_exists head -> (
               match
                 List.find_opt
-                  (fun (el : Types.transition) -> String.equal head el.read)
+                  (fun (el : transition) -> String.equal head el.read)
                   state.transitions
               with
               | None ->
                 (* state has no transition for action_head *)
-                let new_state : Types.state =
+                let new_state : state =
                   { id = get_max_id + 1; transitions = [] }
-                in
-                let new_transition : Types.transition =
-                  { read = head
-                  ; to_state = new_state.id
-                  ; write = (if List.length tail == 0 then move_name else "")
-                  }
-                in
-                add_state_transition state new_transition
-                |> update_state machine |> add_state new_state
-                |> add_move tail new_state
+                and msg = if List.length tail == 0 then move_name else "" in
+                new_transition head new_state.id msg
+                |> with_transition state |> update_state machine
+                |> with_state new_state |> add_move tail new_state
               | Some transition when String.equal transition.write "" -> (
                 match tail with
                 | [] ->
-                  update_state_transition
-                    state
-                    { read = transition.read
-                    ; to_state = transition.to_state
-                    ; write = move_name
-                    }
+                  new_transition transition.read transition.to_state move_name
+                  |> update_state_transition state
                   |> update_state machine
                 | _ -> add_move tail (get_state transition.to_state) machine)
               | Some transition -> (
@@ -130,7 +129,7 @@ let rec parse (ic : in_channel) (accum : Types.full_config) mode count =
           ; machine =
               add_move
                 actions
-                (List.find (fun (e : Types.state) -> e.id == 0) accum.machine)
+                (List.find (fun (e : state) -> e.id == 0) accum.machine)
                 accum.machine
           }
         in
