@@ -19,6 +19,7 @@ let syntax_error line =
   print_endline "";
   exit 3
 
+
 let rec parse (ic : in_channel) (accum : full_config) mode count =
   let parse_key =
     let is_valid_to_add (input : string) (output : string) =
@@ -50,8 +51,7 @@ let rec parse (ic : in_channel) (accum : full_config) mode count =
         | actions ->
             let new_config : full_config =
               let rec add_move actions (state : state) machine =
-                let get_state id = List.find (fun (s : state) -> s.id == id) machine
-                and get_max_id = List.fold_left (fun a (b : state) -> max a b.id) 0 machine
+                let get_max_id = List.fold_left (fun a (b : state) -> max a b.id) 0 machine
                 and update_state (machine : machine) (state : state) : machine =
                   List.rev_map (fun (a : state) -> if a.id == state.id then state else a) machine
                 and update_state_transition (state : state) (transition : transition) : state =
@@ -79,7 +79,7 @@ let rec parse (ic : in_channel) (accum : full_config) mode count =
                         (* state has no transition for action_head *)
                         let new_state : state = { id = get_max_id + 1; transitions = [] }
                         and msg = if List.length tail == 0 then move_name else "" in
-                        new_transition head new_state.id msg
+                        new_transition head new_state msg
                         |> with_transition state
                         |> update_state machine
                         |> with_state new_state
@@ -90,7 +90,7 @@ let rec parse (ic : in_channel) (accum : full_config) mode count =
                             new_transition transition.read transition.to_state move_name
                             |> update_state_transition state
                             |> update_state machine
-                        | _ -> add_move tail (get_state transition.to_state) machine)
+                        | _ -> add_move tail transition.to_state machine)
                     | Some transition -> (
                         match tail with
                         | [] ->
@@ -101,7 +101,7 @@ let rec parse (ic : in_channel) (accum : full_config) mode count =
                             print_endline "";
                             print_endline "This full action sequence is already present";
                             exit 3
-                        | h :: t -> add_move tail (get_state transition.to_state) machine))
+                        | h :: t -> add_move tail transition.to_state machine))
                 | [] -> machine
                 | _ ->
                     print_string "Syntax error on line ";
