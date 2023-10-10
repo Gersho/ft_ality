@@ -11,7 +11,7 @@ let main () =
   try
     let gmr_file = open_in Sys.argv.(1) in
     let result =
-      Parser.parse gmr_file { keyconfig = []; machine = [{ id = 0; transitions = [] }] } Head 1
+      Parser.parse gmr_file Head 1 { keyconfig = []; machine = [{ id = 0; transitions = [] }] }
     in
     let final_parsed : Types.full_config =
       let machine_sorted =
@@ -35,7 +35,7 @@ let main () =
       print_string "     read: ";
       print_string elem.read;
       print_string " to_state: ";
-      print_int elem.to_state.id;
+      print_int elem.to_state;
       print_string " write: ";
       print_endline elem.write
     in
@@ -72,17 +72,17 @@ let main () =
             print_string " has a follow-up in state: ";
             print_int state;
             print_string " pointing to state ";
-            print_int transi.to_state.id;
+            print_int transi.to_state;
             print_endline "";
 
             match transi.write with
             | "" ->
                 print_endline "<not a move, writing nothing>";
-                machine_test transi.to_state.id (count + 1)
+                machine_test transi.to_state (count + 1)
             | str ->
                 print_string "move found, writing: ";
                 print_endline transi.write;
-                machine_test transi.to_state.id (count + 1))
+                machine_test transi.to_state (count + 1))
     in
     machine_test 0 0
   with

@@ -14,4 +14,3 @@ PID = $(shell ps -aux |grep ft_ality | awk {'print $$2'})
 
 kill:
 	kill -9 $(PID)
-

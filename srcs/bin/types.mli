@@ -1,6 +1,6 @@
 type transition = {
   read: string;
-  to_state: state;
+  to_state: int;
   write: string;
 }
 
