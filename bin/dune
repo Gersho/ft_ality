@@ -1,4 +1,0 @@
-(executable
- (public_name ft_ality)
- (name main)
- (libraries ft_ality))
