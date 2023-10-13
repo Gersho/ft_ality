@@ -1,22 +1,16 @@
-up:
-	docker run -d --name ft_ality ft_ality_image
-
 build:
-	docker build -t ft_ality_image .
+	dune build
 
-exec:
-	docker exec -it ft_ality bash
+test:
+	dune test
 
-down: 
-	docker stop ft_ality || true
+run:
+	dune exec ft_ality
 
-rm:
-	docker rm ft_ality || true
+exec: build
+	./_build/install/default/bin/ft_ality ./grammar/SF_Ryu.gmr
 
-fclean: down
-	docker system prune -af
+PID = $(shell ps -aux |grep ft_ality | awk {'print $$2'})
 
-re: down rm build up exec
-
-exec_test:
-	docker exec ft_ality bash -c "echo a ; echo b ; echo c; exit;"
+kill:
+	kill -9 $(PID)
