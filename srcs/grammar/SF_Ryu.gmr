@@ -28,21 +28,21 @@
 ⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⢸⣿⣿⣤⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣤⣄⣀⣠⣴⣿⡿⠀⠀⠀⣷⠀⠀⢸⠀⡆⠀⠀⡆⡿⠀⠀⢸⣿⣿⡿⠋⠉⢿⣿⣿⣶⣾⣇
 ⢻⣿⣿⣿⣿⣿⣿⣿⣷⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠀⠀⠀⣿⠀⠀⠀⡆⠡⠀⠀⣱⠇⠀⠀⣾⣿⡇⠀⠀⠀⠈⣿⣿⣿⣿⣿
 @keyconfig
-1:1
-2:2
-3:3
-4:4
-6:6
-7:7
-8:8
-9:9
-0:taunt
-q:LP
-w:MP
-e:HP
-a:LK
-s:MK
-d:HK
+KP_1:1
+KP_2:2
+KP_3:3
+KP_4:4
+KP_6:6
+KP_7:7
+KP_8:8
+KP_9:9
+KP_0:taunt
+Q:LP
+W:MP
+E:HP
+A:LK
+S:MK
+D:HK
 @movelist
 LP:Light Punch
 MP:Medium Punch
@@ -50,9 +50,9 @@ HP:High Punch
 LK:Light Kick
 MK:Medium Kick
 HK:High Kick
-2-3-6-LP:Hadouken(Light)
-2-3-6-MP:Hadouken(Medium)
-2-3-6-HP:Hadouken(High)
+2-3-6-LP:Hadouken (Light)
+2-3-6-MP:Hadouken (Medium)
+2-3-6-HP:Hadouken (High)
 6-2-3-LP:Shoryuken (Light)
 6-2-3-MP:Shoryuken (Medium)
 6-2-3-HP:Shoryuken (High)
