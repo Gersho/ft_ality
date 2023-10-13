@@ -36,11 +36,7 @@ let parse_key (accum : full_config) (line : int) = function
          machine = accum.machine;
        }
        : full_config)
-  | _ ->
-      print_string "Syntax error on line ";
-      print_int line;
-      print_endline "";
-      exit 3
+  | _ -> syntax_error line
 
 
 let add_move move_name (line : int) actions (accum : full_config) (state : state) =
@@ -78,15 +74,12 @@ let add_move move_name (line : int) actions (accum : full_config) (state : state
             |> update_state machine
             |> with_state new_state
             |> add_move_rec tail new_state
-        | Some transition when String.equal transition.write "" -> (
-            match tail with
-            | [] ->
-                new_transition transition.read transition.to_state move_name
-                |> update_state_transition state
-                |> update_state machine
-            | _ -> add_move_rec tail (get_state transition.to_state) machine)
         | Some transition -> (
-            match tail with
+          match tail with
+            | [] when String.equal transition.write "" ->
+              new_transition transition.read transition.to_state move_name
+              |> update_state_transition state
+              |> update_state machine
             | [] ->
                 (* no tail, write not empty *)
                 (* 2 fully identical action sequences *)
@@ -95,7 +88,7 @@ let add_move move_name (line : int) actions (accum : full_config) (state : state
                 print_endline "";
                 print_endline "This full action sequence is already present";
                 exit 3
-            | h :: t ->
+            | _ ->
                 add_move_rec tail (get_state transition.to_state) machine))
     | [] -> machine
     | _ ->
