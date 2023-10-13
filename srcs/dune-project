@@ -19,7 +19,7 @@
  (name ft_ality)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune ocamlsdl)
+ (depends ocaml dune ocamlsdl2)
  (tags
   (topics "to describe" your project)))
 
