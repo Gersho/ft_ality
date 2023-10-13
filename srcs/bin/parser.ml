@@ -75,11 +75,11 @@ let add_move move_name (line : int) actions (accum : full_config) (state : state
             |> with_state new_state
             |> add_move_rec tail new_state
         | Some transition -> (
-          match tail with
+            match tail with
             | [] when String.equal transition.write "" ->
-              new_transition transition.read transition.to_state move_name
-              |> update_state_transition state
-              |> update_state machine
+                new_transition transition.read transition.to_state move_name
+                |> update_state_transition state
+                |> update_state machine
             | [] ->
                 (* no tail, write not empty *)
                 (* 2 fully identical action sequences *)
@@ -88,8 +88,7 @@ let add_move move_name (line : int) actions (accum : full_config) (state : state
                 print_endline "";
                 print_endline "This full action sequence is already present";
                 exit 3
-            | _ ->
-                add_move_rec tail (get_state transition.to_state) machine))
+            | _ -> add_move_rec tail (get_state transition.to_state) machine))
     | [] -> machine
     | _ ->
         print_string "Syntax error on line ";
