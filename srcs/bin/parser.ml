@@ -126,7 +126,7 @@ let rec parse (ic : in_channel) (mode : parsing_mode) count (accum : full_config
   | l when mode == Movelist ->
       String.split_on_char ':' l |> parse_transition accum count |> parse ic mode (count + 1)
   | l when mode == Head ->
-      (* print_endline l; *)
+      print_endline l;
       parse ic Head (count + 1) accum
   | _ -> parse ic mode (count + 1) accum
   | exception End_of_file ->
