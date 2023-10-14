@@ -1,20 +1,24 @@
-./ft_ality --help
-./ft_ality --file-syntax
-./ft_ality <file> [--debug]
+ft_ality
+A state machine in functional programming reading keyboard input and displaying corresponding moves based on a provided grammar file
 
 ###################################
-		gmr file syntax
+			usage
+###################################
+
+./ft_ality --help
+./ft_ality --file-syntax
+./ft_ality <grammar file> [--debug]
+
+###################################
+		grammar file syntax
 ###################################
 
 leading/trailing whitespace are ignored
 empty lines are ignored
 section names start with a @
 2 sections, @keyconfig and @movelist
-each section can only be present once
 each section is required
-@keyconfig is first and @movelist second
-lines before @keyconfig are ignored
-
+lines before the first section are printed but ignored
 
 	@keyconfig:
 		symbol ":" is reserved and cannot be used as a key nor as part of an action
@@ -26,13 +30,23 @@ lines before @keyconfig are ignored
 		a key cannot be repeated
 		an action can be repeated
 
+		<key> reserved by system cannot be used (such as media keys, super, printscreen)
+		<key> naming is based on (keycode)_to_string from sdlkeycode.ml
+			-> numeric keypad keys must be prefaced by KP_ such as
+				KP_2
+				KP_Minus
+			-> single letters must be upper-case
+			-> numbers from the character keys must be prefaced by Num such as
+				Num2
+				Num9
+
 		exemple:
 		a:kick
 		k:HK
 		l:LP
-		2:2
-		3:3
-		6:6
+		KP_2:2
+		KP_3:3
+		KP_6:6
 		q:LP
 		w:MP
 		e:HP
@@ -45,8 +59,7 @@ lines before @keyconfig are ignored
 
 		section must have at least 1 <action>:<move> pair
 		the same full action sequence cannot be repeated
-		a move can be repeated (...but why ?)
-
+		
 		exemple:
 		2-3-6-LP:Hadouken
 	

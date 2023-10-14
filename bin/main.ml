@@ -63,7 +63,6 @@ let main () =
     print_endline "#### START MACHINE ####";
     let rec machine_test state =
       let key = get_input () in
-
       let rec process_input state = function
         | Some (input : Types.key) -> (
             let a = (List.nth final_parsed.machine state).transitions in

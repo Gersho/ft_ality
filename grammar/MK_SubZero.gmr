@@ -1,0 +1,10 @@
+@keyconfig
+LCtrl:FP
+LShift:BP
+LAlt:FK
+RCtrl:BK
+RShift:up
+RAlt:down
+@movelist
+FP-BP:test1
+BK-down:test2
