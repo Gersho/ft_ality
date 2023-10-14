@@ -1,16 +1,15 @@
-build:
+all:
 	dune build
+	cp -f ./_build/install/default/bin/ft_ality ./ft_ality
 
-test:
-	dune test
+exec: all
+	./ft_ality ./grammar/SF_Ryu.gmr
 
-run:
-	dune exec ft_ality
+clean:
+	rm -rf ./_build
+	rm -rf ft_ality.opam
 
-exec: build
-	./_build/install/default/bin/ft_ality ./grammar/SF_Ryu.gmr
+fclean: clean
+	rm -rf ft_ality
 
-PID = $(shell ps -aux |grep ft_ality | awk {'print $$2'})
 
-kill:
-	kill -9 $(PID)

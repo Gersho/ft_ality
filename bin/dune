@@ -1,11 +1,7 @@
 (executable
  (public_name ft_ality)
  (name main)
- (libraries
-  ft_ality
-  sdl2
-  )
- (flags
-  (-w -69))
+ (libraries sdl2)
+ (flags)
  (modules main parser types)
  (modules_without_implementation types))

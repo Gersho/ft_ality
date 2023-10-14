@@ -1,5 +1,3 @@
-(* allowed modules Pervasives Sys List String Sdl Sdlevent Sdlkey *)
-
 let print_machine (config : Types.full_config) =
   (* debug print *)
   print_endline "debug print: ";
