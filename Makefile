@@ -4,7 +4,6 @@ all:
 
 clean:
 	rm -rf ./_build
-	rm -rf ft_ality.opam
 
 fclean: clean
 	rm -rf ft_ality

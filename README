@@ -18,6 +18,8 @@ empty lines are ignored
 section names start with a @
 2 sections, @keyconfig and @movelist
 each section is required
+@keyconfig should be the first section
+(action used in @movelist must be previously declared in @keyconfig)
 lines before the first section are printed but ignored
 
 	@keyconfig:

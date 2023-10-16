@@ -3,5 +3,5 @@
  (name main)
  (libraries sdl2)
  (flags)
- (modules main parser types)
+ (modules main parser types help debug)
  (modules_without_implementation types))
