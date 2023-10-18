@@ -34,23 +34,45 @@ let print_machine (machine: Types.machine)=
   List.iter print_state machine
 
 let print_has_transition (current_state: int)(transi: Types.transition) = 
+  (* Black: 30.
+  Red: 31.
+  Green: 32.
+  Yellow: 33.
+  Blue: 34.
+  Magenta: 35.
+  Cyan: 36.
+  White: 37. *)
+  (* print_string "\027[31m blabla"; *)
   print_string "State: ";
+  print_string "\027[34m";
   print_int current_state;
-  print_string " has a follow-up for input: ";
+  print_string "\027[37m";
+  print_string "\027[32m has a follow-up \027[37m for action: ";
+  print_string "\027[33m";
   print_string transi.read;
+  print_string "\027[37m";
   print_string " pointing to state ";
+  print_string "\027[34m";
   print_int transi.to_state;
+  print_string "\027[37m";
   match transi.write with
   | "" -> print_endline " with no move, printing nothing"
   | str -> (print_string " with a move, printing "; print_endline transi.write )
 
 let print_no_transition (input: string) (current_state: int) = 
   print_string "State: ";
+  print_string "\027[34m";
   print_int current_state;
-  print_string " has no follow-up for input: ";
+  print_string "\027[37m";
+  print_string "\027[31m has no follow-up \027[37m for action: ";
+  print_string "\027[33m";
   print_string input;
+  print_string "\027[37m";
   if current_state == 0 then
-    print_endline "staying in state 0" 
+    print_endline " staying in state 0" 
   else
-  print_endline " -> going back to state 0 and reprocess input";
+  (
+    print_endline " -> going back to state \027[34m0\027[37m and reprocess action";
+    print_string " -> ";
+  )
 

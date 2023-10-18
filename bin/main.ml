@@ -33,6 +33,10 @@ let main () =
       { keyconfig = result.keyconfig; machine = machine_sorted }
     in
 
+
+    if ( (*List.length final_parsed.keyconfig == 0 || *) List.length final_parsed.machine == 1) 
+      then (print_endline "no valid configuration found"; exit 3 );
+
     if debug then (Debug.print_machine (final_parsed.machine));
     Debug.print_key_mappings (final_parsed.keyconfig);
 
@@ -59,7 +63,7 @@ let main () =
                     print_endline transi.write;
                     machine_test transi.to_state)
             | None ->
-                if debug then Debug.print_no_transition (input.input_string) (state);
+                if debug then Debug.print_no_transition (input.output_string) (state);
                 if state == 0 then machine_test 0 else process_input 0 (Some input))
         | None -> machine_test state
       in

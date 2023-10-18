@@ -63,4 +63,12 @@ MP-6-2-3-HP:Medium Punch into Shoryuken (High)
 LP-MP-6-2-3-LP:Light Punch into Medium Punch into Shoryuken (Light)
 LP-MP-6-2-3-MP:Light Punch into Medium Punch into Shoryuken (Medium)
 LP-MP-6-2-3-HP:Light Punch into Medium Punch into Shoryuken (High)
-LP-MP-6-2-3-HP-taunt:always taunt after a nice combo
+LP-MP-6-2-3-LP-taunt:always taunt after a nice combo!
+LP-MP-6-2-3-MP-taunt:always taunt after a nice combo!
+LP-MP-6-2-3-HP-taunt:always taunt after a nice combo!
+2-1-4-LK:Tatsumaki Senpuu Kyaku (Light)
+2-1-4-MK:Tatsumaki Senpuu Kyaku (Medium)
+2-1-4-HK:Tatsumaki Senpuu Kyaku (High)
+2-3-6-2-3-6-LP:Shinkuu Hadou Ken
+2-3-6-2-3-6-MP:Shinkuu Hadou Ken
+2-3-6-2-3-6-HP:Shinkuu Hadou Ken
