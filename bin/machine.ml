@@ -37,4 +37,13 @@ let rec machine_rec (config : full_config) debug state =
   |> process_input state
 
 
+let init () =
+  try
+    Sdl.init [`VIDEO];
+    ignore (Sdl.Render.create_window_and_renderer ~width:0 ~height:0 ~flags:[Sdlwindow.Borderless]);
+    at_exit Sdl.quit
+  with
+  | e -> raise e
+
+
 let run (config : full_config) (debug : bool) = machine_rec config debug 0

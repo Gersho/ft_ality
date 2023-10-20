@@ -1,9 +1,9 @@
 (* print_key_mappings should be separate from other print, it must be printed even without debug *)
 let print_key_mappings (keyconfig : Types.key list) =
   let print_keyconf (key : Types.key) =
-    print_string "key.input: ";
+    print_string "input: ";
     print_string key.input_string;
-    print_string " -> key.output: ";
+    print_string " -> action: ";
     print_endline key.output_string
   in
   print_endline "";
@@ -35,18 +35,13 @@ let print_machine (machine : Types.machine) =
 
 
 let print_has_transition (current_state : int) (transi : Types.transition) =
-  print_string "State: ";
-  print_string "\027[34m";
+  print_string "State: \027[34m";
   print_int current_state;
-  print_string "\027[37m";
-  print_string "\027[32m has a follow-up \027[37m for action: ";
-  print_string "\027[33m";
+  print_string "\027[32m has a follow-up \027[37m for action: \027[33m";
   print_string transi.read;
-  print_string "\027[37m";
-  print_string " pointing to state ";
-  print_string "\027[34m";
+  print_string "\027[0m pointing to state \027[34m";
   print_int transi.to_state;
-  print_string "\027[37m";
+  print_string "\027[0m";
   match transi.write with
   | "" -> print_endline " with no move, printing nothing"
   | str ->
@@ -55,16 +50,12 @@ let print_has_transition (current_state : int) (transi : Types.transition) =
 
 
 let print_no_transition (input : string) (current_state : int) =
-  print_string "State: ";
-  print_string "\027[34m";
+  print_string "State: \027[34m";
   print_int current_state;
-  print_string "\027[37m";
-  print_string "\027[31m has no follow-up \027[37m for action: ";
-  print_string "\027[33m";
+  print_string "\027[31m has no follow-up \027[37m for action: \027[33m";
   print_string input;
-  print_string "\027[37m";
+  print_string "\027[0m";
   if current_state == 0 then
     print_endline " staying in state 0"
-  else (
-    print_endline " -> going back to state \027[34m0\027[37m and reprocess action";
-    print_string " -> ")
+  else
+    print_endline " -> \027[34mgoing back\027[37m to state \027[34m0\027[37m and reprocess action"
