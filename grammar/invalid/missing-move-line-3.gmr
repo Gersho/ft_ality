@@ -1,0 +1,5 @@
+@keyconfig
+A:A
+B:
+@movelist
+A-B:Hello World!
