@@ -1,6 +1,5 @@
-(* print_key_mappings should be separate from other print,
-   it must be printed even without debug *)
-let print_key_mappings (keyconfig: Types.key list)=
+(* print_key_mappings should be separate from other print, it must be printed even without debug *)
+let print_key_mappings (keyconfig : Types.key list) =
   let print_keyconf (key : Types.key) =
     print_string "key.input: ";
     print_string key.input_string;
@@ -13,7 +12,8 @@ let print_key_mappings (keyconfig: Types.key list)=
   List.iter print_keyconf keyconfig;
   print_endline ""
 
-let print_machine (machine: Types.machine)=
+
+let print_machine (machine : Types.machine) =
   print_endline "";
   print_endline "#### Machine States ####";
   print_endline "";
@@ -33,16 +33,8 @@ let print_machine (machine: Types.machine)=
   in
   List.iter print_state machine
 
-let print_has_transition (current_state: int)(transi: Types.transition) = 
-  (* Black: 30.
-  Red: 31.
-  Green: 32.
-  Yellow: 33.
-  Blue: 34.
-  Magenta: 35.
-  Cyan: 36.
-  White: 37. *)
-  (* print_string "\027[31m blabla"; *)
+
+let print_has_transition (current_state : int) (transi : Types.transition) =
   print_string "State: ";
   print_string "\027[34m";
   print_int current_state;
@@ -57,9 +49,12 @@ let print_has_transition (current_state: int)(transi: Types.transition) =
   print_string "\027[37m";
   match transi.write with
   | "" -> print_endline " with no move, printing nothing"
-  | str -> (print_string " with a move, printing "; print_endline transi.write )
+  | str ->
+      print_string " with a move, printing ";
+      print_endline transi.write
 
-let print_no_transition (input: string) (current_state: int) = 
+
+let print_no_transition (input : string) (current_state : int) =
   print_string "State: ";
   print_string "\027[34m";
   print_int current_state;
@@ -69,10 +64,7 @@ let print_no_transition (input: string) (current_state: int) =
   print_string input;
   print_string "\027[37m";
   if current_state == 0 then
-    print_endline " staying in state 0" 
-  else
-  (
+    print_endline " staying in state 0"
+  else (
     print_endline " -> going back to state \027[34m0\027[37m and reprocess action";
-    print_string " -> ";
-  )
-
+    print_string " -> ")

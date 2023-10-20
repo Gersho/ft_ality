@@ -20,7 +20,8 @@ let syntax_error line =
   exit 3
 
 
-let parse_key (accum : full_config) (line : int) = function
+let parse_key (accum : full_config) (line : int) (inout : string list) =
+  match inout with
   | [input; output]
     when List.exists (fun (key : key) -> String.equal key.input_string input) accum.keyconfig ->
       print_string "Duplicated key ";
@@ -101,7 +102,8 @@ let add_move move_name (line : int) actions (accum : full_config) (state : state
   add_move_rec actions state accum.machine
 
 
-let parse_transition (accum : full_config) (line : int) = function
+let parse_transition (accum : full_config) (line : int) (inout : string list) =
+  match inout with
   | [actions_as_string; move_name] when String.length move_name > 0 -> (
       match String.split_on_char '-' actions_as_string with
       | [] -> syntax_error line
