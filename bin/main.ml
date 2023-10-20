@@ -57,11 +57,11 @@ let main () =
       let key = get_input () in
       let rec process_input state = function
         | Some (input : Types.key) -> (
-            let a = (List.nth final_parsed.machine state).transitions in
+            let transitions = (List.nth final_parsed.machine state).transitions in
             match
               List.find_opt
                 (fun (el : Types.transition) -> String.equal input.output_string el.read)
-                a
+                transitions
             with
             | Some transi -> (
                 if debug then Debug.print_has_transition state transi;
