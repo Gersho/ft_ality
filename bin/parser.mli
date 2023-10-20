@@ -3,4 +3,4 @@ type parsing_mode =
   | Keyconfig
   | Movelist
 
-val parse : in_channel -> parsing_mode -> int -> Types.full_config -> Types.full_config
+val parse : in_channel -> Types.full_config

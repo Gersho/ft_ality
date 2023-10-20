@@ -118,19 +118,31 @@ let parse_transition (accum : full_config) (line : int) (inout : string list) =
   | _ -> syntax_error line
 
 
-let rec parse (ic : in_channel) (mode : parsing_mode) count (accum : full_config) =
+let rec parse_loop (ic : in_channel) (mode : parsing_mode) count (accum : full_config) =
   match String.trim (input_line ic) with
-  | "" -> parse ic mode (count + 1) accum (* skip empty lines *)
-  | "@keyconfig" -> parse ic Keyconfig (count + 1) accum
-  | "@movelist" -> parse ic Movelist (count + 1) accum
+  | "" -> parse_loop ic mode (count + 1) accum (* skip empty lines *)
+  | "@keyconfig" -> parse_loop ic Keyconfig (count + 1) accum
+  | "@movelist" -> parse_loop ic Movelist (count + 1) accum
   | l when mode == Keyconfig ->
-      String.split_on_char ':' l |> parse_key accum count |> parse ic mode (count + 1)
+      String.split_on_char ':' l |> parse_key accum count |> parse_loop ic mode (count + 1)
   | l when mode == Movelist ->
-      String.split_on_char ':' l |> parse_transition accum count |> parse ic mode (count + 1)
+      String.split_on_char ':' l |> parse_transition accum count |> parse_loop ic mode (count + 1)
   | l when mode == Head ->
       print_endline l;
-      parse ic Head (count + 1) accum
-  | _ -> parse ic mode (count + 1) accum
+      parse_loop ic Head (count + 1) accum
+  | _ -> parse_loop ic mode (count + 1) accum
   | exception End_of_file ->
       close_in ic;
       accum
+
+
+let parse (ic : in_channel) : full_config =
+  let result = parse_loop ic Head 1 { keyconfig = []; machine = [{ id = 0; transitions = [] }] } in
+  if List.length result.machine == 1 then (
+    print_endline "no valid configuration found";
+    exit 3);
+  {
+    keyconfig = result.keyconfig;
+    machine =
+      List.sort (fun (a : Types.state) (b : Types.state) -> compare a.id b.id) result.machine;
+  }
