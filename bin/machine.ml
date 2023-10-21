@@ -33,7 +33,8 @@ let rec machine_rec (config : full_config) debug state =
             if state == 0 then machine_rec config debug 0 else process_input 0 (Some input))
     | None -> machine_rec config debug state
   in
-  List.find_opt (fun (el : key) -> String.equal el.input_string (get_input ())) config.keyconfig
+  let next_input = get_input () in
+  List.find_opt (fun (el : key) -> String.equal el.input_string next_input) config.keyconfig
   |> process_input state
 
 
