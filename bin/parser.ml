@@ -132,7 +132,6 @@ let rec parse_loop (ic : in_channel) (mode : parsing_mode) count (accum : full_c
       parse_loop ic Head (count + 1) accum
   | _ -> parse_loop ic mode (count + 1) accum
   | exception End_of_file ->
-      close_in ic;
       accum
 
 
